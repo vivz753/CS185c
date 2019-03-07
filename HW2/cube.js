@@ -1,44 +1,69 @@
-get = () => {
+getPositions = () => {
   positions = [];
 
+  // const numSegments = 5;
+  // const radius = 1;
+  // let cubePositions = [];
+  //   for (let i = 0; i <2; i ++) {
+  //     if (i===0) { y = 1; }
+  //     else { y = -1; }
+  //     for(let angle = -3.14; angle < 3.14; angle+=(2*3.14/numSegments)) {
+  //       // console.log('angle: ' + angle);
+  //       let x = radius*math.cos(angle);
+  //       let z = radius*math.sin(angle);
+  //       // console.log("x, y, z: " + x + ", " + y + ", " + z);
+  //       cubePositions.push(x, y, z);
+  //       console.log(cubePositions);
+  //     }
+  //   };
+
+  positions = positions.concat(getCylinderPositions()); //indices 0-11
+
+
+  positions = positions.concat(getPyramidPositions()); //indices 12-16
+
+  positions = positions.concat(getPlanePositions()); //indices 17-20
+  // console.log(positions);
+  return positions;
+
+}
+
+getCylinderPositions = () => {
   const numSegments = 5;
   const radius = 1;
-  const cubePositions = [];
+  let cubePositions = [];
     for (let i = 0; i <2; i ++) {
       if (i===0) { y = 1; }
       else { y = -1; }
       for(let angle = -3.14; angle < 3.14; angle+=(2*3.14/numSegments)) {
         // console.log('angle: ' + angle);
-        x = radius*math.cos(angle);
-        z = radius*math.sin(angle);
+        let x = radius*math.cos(angle);
+        let z = radius*math.sin(angle);
         // console.log("x, y, z: " + x + ", " + y + ", " + z);
         cubePositions.push(x, y, z);
+        console.log(cubePositions);
       }
     };
-  positions = positions.concat(cubePositions); //indices 0-11
+  return cubePositions;
+}
 
-
-  pyramidPositions = [
+getPyramidPositions = () => {
+    return pyramidPositions = [
         0, 2, 0,
         -1.0,  1.0, -1.0,
         -1.0,  1.0,  1.0,
          1.0,  1.0,  1.0,
          1.0,  1.0, -1.0,
-  ]
+  ];
+}
 
-  positions = positions.concat(pyramidPositions); //indices 12-16
-
-  planePositions = [
+getPlanePositions = () => {
+    return planePositions = [
   -5, -1, -5,
   -5, -1, 5,
   5, -1, -5,
   5, -1, 5,
-  ]
-
-  positions = positions.concat(planePositions); //indices 17-20
-  console.log(positions);
-  return positions;
-
+  ];
 }
 
 getCylinderIndices = () => {
