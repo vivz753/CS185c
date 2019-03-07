@@ -1,9 +1,9 @@
 <!doctype html>
 <html>
 <head>
- <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/5.6.0/math.min.js" type="text/javascript"></script>
- <script src = "./smurfhouse.js"></script>
- <meta charset="utf-8" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/5.6.0/math.min.js" type="text/javascript"></script>
+<script src = "./smurfhouse.js"></script>
+<meta charset="utf-8" />
 <title>WebGL Demo</title>
 <style>
 canvas {
@@ -13,8 +13,10 @@ canvas {
 }
 </style>
 </head>
-<body onload="InitScene();">
-<canvas id="glcanvas" ></canvas>
+ <body>
+<div>
+<canvas id="glcanvas" width="640" height="480"></canvas>
+</div>
 <!-- gl-matrix.js is an auxiliary javascript program with functions for the
      common computer graphics matrix transforms. It can be downloaded
      either at:
@@ -22,26 +24,22 @@ canvas {
      or from the Mozilla sample site.
 -->
 <script src="./gl-matrix.js"></script>
-
-
-<script type="text/javascript">
-  var cubeRotation = 0.0;
-  var sizeOfIndices = 0;
-  var InitScene = function ()
+<script>
+var cubeRotation = 0.0;
+//run our program
+main();
+/*
+   Here is the code to make a rotating cube
+ */
+function main()
 {
-    const canvas = document.querySelector('#glcanvas');
-    const gl = canvas.getContext('webgl') ||
-        canvas.getContext('experimental-webgl');
-    // If we don't have a GL context, give up now
-    if (!gl) {
-        alert('Unable to initialize WebGL. Your browser or machine '+
-            'may not support it.');
-        return;
-    }
-
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    gl.viewport(0,0,window.innerWidth, window.innerHeight);
+    let sizeOfIndices = 0;
+    var canvas = document.querySelector('#glcanvas');
+    var gl = null;
+    var shaderProgram= null;
+    var vr_display = null;
+    var programInfo = null;
+    var buffers = null;
     // Vertex shader program
     const vsSource = `
         attribute vec4 aVertexPosition;
@@ -62,55 +60,176 @@ canvas {
             gl_FragColor = vColor;
         }
     `;
-    /* Initialize a shader program; this is where all the lighting
-        for the vertices and so forth is established. */
-    const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
-    /* Collect all the info needed to use the shader program.
-        Look up which attributes our shader program is using
-        for aVertexPosition, aVertexColor and also
-        look up uniform locations.
-    */
-    const programInfo = {
-        program: shaderProgram,
-        attribLocations: {
-            vertexPosition: gl.getAttribLocation(shaderProgram,
-                'aVertexPosition'),
-            vertexColor: gl.getAttribLocation(shaderProgram, 'aVertexColor'),
-        },
-        uniformLocations: {
-            projectionMatrix:
-                gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
-            modelViewMatrix:
-                gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
-        },
-    };
-    /* Here's where we call the routine that builds all the
-      objects we'll be drawing. */
-    const buffers = initBuffers(gl, 0);
+    function init(preserve_drawing_buffer)
+    {
+        var gl_attribs = {
+            alpha: false,
+            antialias: false,
+            preserveDrawingBuffer: preserve_drawing_buffer
+        };
+        gl = canvas.getContext("webgl", gl_attribs);
+        canvas.getContext('webgl', gl_attribs) ||
+            canvas.getContext('experimental-webgl', gl_attribs);
+        // If we don't have a GL context, give up now
+        if (!gl) {
+            alert('Unable to initialize WebGL. Your browser or machine '+
+                'may not support it.');
+            return;
+        }
+
+        // canvas.width = window.innerWidth;
+        // canvas.height = window.innerHeight;
+        // gl.viewport(0,0,window.innerWidth, window.innerHeight);
+
+        shaderProgram = initShaderProgram(gl, vsSource, fsSource);
+        programInfo = {
+            program: shaderProgram,
+            attribLocations: {
+                vertexPosition: gl.getAttribLocation(shaderProgram,
+                    'aVertexPosition'),
+                vertexColor: gl.getAttribLocation(shaderProgram,
+                    'aVertexColor'),
+            },
+            uniformLocations: {
+                projectionMatrix:
+                    gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
+                modelViewMatrix:
+                    gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
+            },
+        };
+        buffers = initBuffers(gl);
+        // Wait until we have a WebGL context to resize and start rendering.
+        window.addEventListener("resize", onResize, false);
+        onResize();
+        window.requestAnimationFrame(render);
+    }
+    function onResize() 
+    {
+        if (vr_display && vr_display.isPresenting) {
+            console.log("vr headset presenting");
+            var left_eye = vr_display.getEyeParameters("left");
+            var right_eye = vr_display.getEyeParameters("right");
+            console.log("left eye: " + left_eye);
+            console.log("right eye: " + right_eye);
+            canvas.width = Math.max(left_eye.renderWidth,
+                right_eye.renderWidth) * 2;
+            canvas.height = Math.max(left_eye.renderHeight,
+                right_eye.renderHeight);
+        } else {
+            canvas.width =
+                canvas.offsetWidth;
+            canvas.height =
+                canvas.offsetHeight;
+        }
+    }
     var then = 0;
     // Draw the scene repeatedly
-    function render(now) {
+    function onContextLost(event)
+    {
+        event.preventDefault();
+        console.log( 'WebGL Context Lost.' );
+        gl = null;
+    }
+    function onContextRestored(event)
+    {
+        console.log( 'WebGL Context Restored.' );
+        init(vr_display ? vr_display.capabilities.hasExternalDisplay : false);
+    }
+    function onVRRequestPresent()
+    {
+        vr_display.requestPresent([{ source: canvas }]).then(function () {
+            console.log("hi there!! presenting");
+        }, function (err) {
+            var errMsg = "requestPresent failed.";
+            if (err && err.message) {
+                errMsg += "<br />" + err.message
+            }
+            console.log(errMsg);
+        });
+    }
+    function onVRExitPresent()
+    {
+        if (!vr_display.isPresenting) {
+            return;
+        }
+        vr_display.exitPresent().then(function () {
+            window.requestAnimationFrame(render);
+        }, function () {
+            console.log("exitPresent failed.");
+        });
+    }
+    function onVRPresentChange()
+    {
+        onResize();
+        var tl = document.getElementById('tl');
+        if (vr_display.isPresenting) {
+            console.log("vr is presenting");
+            if (vr_display.capabilities.hasExternalDisplay) {
+                removeButton(vr_present_button);
+                vr_present_button = addButton("Exit VR",
+                    onVRExitPresent);
+            }
+        } else {
+            if (vr_display.capabilities.hasExternalDisplay) {
+                removeButton(vr_present_button);
+                vr_present_button = addButton("Enter VR",
+                    onVRRequestPresent);
+            }
+        }
+    }
+    canvas.addEventListener('webglcontextlost', onContextLost, false );
+    canvas.addEventListener('webglcontextrestored', onContextRestored,
+        false);
+    if (navigator.getVRDisplays) {
+        frame_data = new VRFrameData();
+        navigator.getVRDisplays().then(function (displays) {
+            if (displays.length > 0) {
+                vr_display = displays[displays.length - 1];
+                init(true);
+                if (vr_display.capabilities.canPresent) {
+                    vr_present_button = addButton("Enter VR",
+                        onVRRequestPresent);
+                }
+                window.addEventListener('vrdisplaypresentchange',
+                    onVRPresentChange, false);
+                window.addEventListener('vrdisplayactivate', onVRRequestPresent,
+                    false);
+                window.addEventListener('vrdisplaydeactivate', onVRExitPresent,
+                    false);
+            } else {
+                init(false);
+                window.requestAnimationFrame(render);
+                console.log("No VRDisplays found.");
+            }
+        },
+        function () {
+            init(false);
+            window.requestAnimationFrame(render);
+            console.log("No WebVR support.");
+        });
+    }
+    function render(now)
+    {
         now *= 0.001;  // convert to seconds
         const deltaTime = now - then;
         then = now;
-        drawScene(gl, programInfo, buffers, deltaTime);
-        requestAnimationFrame(render);
+        drawScene(vr_display, gl, programInfo, buffers, deltaTime);
+        if (vr_display && vr_display.isPresenting) {
+            vr_display.requestAnimationFrame(render);
+        } else {
+            window.requestAnimationFrame(render);
+        }
     }
-    requestAnimationFrame(render);
 }
 /*
   initBuffers
   Initialize the buffers we'll need. For this demo, we just
   have one object -- a simple three-dimensional cube.
 */
-
-
 function initBuffers(gl, i)
 {
+    console.log('init buffers method being called');
   let buffers = {};
-
-
-
 
     let positions = [];
     let indices = [];
@@ -151,11 +270,23 @@ function initBuffers(gl, i)
     // };
 }
 /*
+   Get an orientation from a pose
+ */
+function getPoseMatrix(out, pose)
+{
+    var orientation = pose.orientation;
+    if (!orientation) {
+        orientation = [0, 0, 0, 1];
+    }
+    mat4.fromQuat(out, orientation);
+    mat4.invert(out, out);
+}
+/*
   Draw the scene.
  */
-function drawScene(gl, programInfo, buffers, deltaTime)
+function drawScene(vr_display, gl, programInfo, buffers, deltaTime)
 {
-
+    var canvas = document.querySelector('#glcanvas');
     gl.clearColor(0.0, 0.0, 0.0, 1.0);  // Clear to black, fully opaque
     gl.clearDepth(1.0);                 // Clear everything
     gl.enable(gl.DEPTH_TEST);           // Enable depth testing
@@ -173,28 +304,32 @@ function drawScene(gl, programInfo, buffers, deltaTime)
     const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
     const zNear = 0.1;
     const zFar = 100.0;
+    if (vr_display) {
+        vr_display.depthNear = zNear;
+        vr_display.depthFar = zFar;
+    }
     const projectionMatrix = mat4.create();
     /* note: glmatrix.js always has the first argument
        as the destination to receive the result. */
-    mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear,
-      zFar);
+    mat4.perspective(projectionMatrix, fieldOfView, aspect,
+        zNear, zFar);
     /* Set the drawing position to the "identity" point, which is
        the center of the scene.
      */
-    const modelViewMatrix = mat4.create();
+    var modelViewMatrix = mat4.create();
     /* Now move the drawing position a bit to where we want to
        start drawing the square. */
     mat4.translate(modelViewMatrix,// destination matrix
         modelViewMatrix,     // matrix to translate
-        [-0.0, -3.0, -15.0]);  // amount to translate
+        [-0.0, 0.0, -15.0]);  // amount to translate
     // mat4.rotate(modelViewMatrix,  // destination matrix
     //     modelViewMatrix,  // matrix to rotate
     //     cubeRotation,     // amount to rotate in radians
     //     [0, 0, 1]);       // axis to rotate around (Z)
-    // mat4.rotate(modelViewMatrix,  // destination matrix
-    //     modelViewMatrix,  // matrix to rotate
-    //     cubeRotation * .7,// amount to rotate in radians
-    //     [0, 1, 0]);       // axis to rotate around (X)
+    mat4.rotate(modelViewMatrix,  // destination matrix
+        modelViewMatrix,  // matrix to rotate
+        cubeRotation * .7,// amount to rotate in radians
+        [0, 1, 0]);       // axis to rotate around (X)
     /* Tell WebGL how to pull out the positions from the position
        buffer into the vertexPosition attribute
      */
@@ -205,18 +340,14 @@ function drawScene(gl, programInfo, buffers, deltaTime)
         const stride = 0;
         const offset = 0;
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
-        gl.vertexAttribPointer(
-          programInfo.attribLocations.vertexPosition,
-          numComponents, 
-          type, 
-          normalize, 
-          stride, 
-          offset);
+        gl.vertexAttribPointer(programInfo.attribLocations.vertexPosition,
+            numComponents, type, normalize, stride, offset);
         gl.enableVertexAttribArray(
             programInfo.attribLocations.vertexPosition);
     }
-    // Tell WebGL how to pull out the colors from the color buffer
-    // into the vertexColor attribute.
+    /* Tell WebGL how to pull out the colors from the color buffer
+      into the vertexColor attribute.
+     */
     {
         const numComponents = 4;
         const type = gl.FLOAT;
@@ -234,14 +365,36 @@ function drawScene(gl, programInfo, buffers, deltaTime)
     // Tell WebGL to use our program when drawing
     gl.useProgram(programInfo.program);
     // Set the shader uniforms
-    gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix,
-        false, projectionMatrix);
-    gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix,
-        false, modelViewMatrix);
-    {
-        const vertexCount = sizeOfIndices;
-        const type = gl.UNSIGNED_SHORT;
-        const offset = 0;
+    if (vr_display && vr_display.isPresenting) {
+        vr_display.getFrameData(frame_data);
+        var poseMatrix =  mat4.create();
+        var vrModelViewMatrix = mat4.create();
+        getPoseMatrix(poseMatrix, frame_data.pose);
+        mat4.multiply(vrModelViewMatrix, poseMatrix, modelViewMatrix);
+        gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix,
+            false, vrModelViewMatrix);
+        gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix,
+            false, frame_data.leftProjectionMatrix);
+        gl.viewport(0, 0, canvas.width * 0.5, canvas.height);
+
+        var vertexCount = sizeOfIndices;
+        var type = gl.UNSIGNED_SHORT;
+        var offset = 0;
+        gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
+        gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix,
+            false, frame_data.rightProjectionMatrix);
+        gl.viewport(canvas.width * 0.5, 0,
+            canvas.width * 0.5, canvas.height);
+        gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
+        vr_display.submitFrame();
+    } else {
+        gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix,
+            false, modelViewMatrix);
+        gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix,
+            false, projectionMatrix);
+        var vertexCount = 36;
+        var type = gl.UNSIGNED_SHORT;
+        var offset = 0;
         gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
     }
     // Update the rotation for the next draw
@@ -288,7 +441,65 @@ function loadShader(gl, type, source)
     }
     return shader;
 }
+function addButtonElement(message)
+{
+    var button_elt = document.createElement("div");
+    var webgl_canvas = document.getElementById('glcanvas');
+    var button_container = document.getElementById("vr-button-container");
+    if (!button_container) {
+        button_container = document.createElement("div");
+        button_container.id = "vr-button-container";
+        Object.assign(button_container.style, {
+            fontFamily : "sans-serif",
+            position : "absolute",
+            zIndex : "999",
+            left : "0",
+            bottom : "0",
+            right : "0",
+            margin : "0",
+            padding : "0"
+        });
+        button_container.align = "right";
+        webgl_canvas.parentNode.appendChild(button_container);
+    }
+    Object.assign(button_elt.style, {
+        color: "#FFF",
+        fontWeight: "bold",
+        backgroundColor : "#888",
+        borderRadius : "5px",
+        border : "3px solid #555",
+        position : "relative",
+        display :  "inline-block",
+        margin : "0.5em",
+        padding : "0.75em",
+        cursor : "pointer",
+    });
+    button_elt.align = "center";
+    button_elt.innerHTML = "<img src='vricon.png' style='width:1in' /><br />" +
+        message;
+    button_container.appendChild(button_elt);
+    return button_elt;
+}
+function addButton(message, callback)
+{
+    var element = addButtonElement(message);
+    element.addEventListener("click", function (event) {
+        callback(event);
+        event.preventDefault();
+    }, false);
+    return {
+        element: element,
+    };
+}
+function removeButton(button)
+{
+    if (!button) {
+        return;
+    }
+    if (button.element.parentElement) {
+        button.element.parentElement.removeChild(button.element);
+    }
+}
 </script>
-
 </body>
 </html>
