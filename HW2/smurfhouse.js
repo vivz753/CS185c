@@ -23,7 +23,7 @@ getPositions = () => {
   positions = positions.concat(getPyramidPositions()); //indices 12-16
 
   positions = positions.concat(getPlanePositions()); //indices 17-20
-  // console.log(positions);
+  console.log(positions);
   return positions;
 
 }
@@ -31,7 +31,7 @@ getPositions = () => {
 getCylinderPositions = () => {
   const numSegments = 5;
   const radius = 1;
-  let cubePositions = [];
+  let cylinderPositions = [];
     for (let i = 0; i <2; i ++) {
       if (i===0) { y = 1; }
       else { y = -1; }
@@ -40,11 +40,10 @@ getCylinderPositions = () => {
         let x = radius*math.cos(angle);
         let z = radius*math.sin(angle);
         // console.log("x, y, z: " + x + ", " + y + ", " + z);
-        cubePositions.push(x, y, z);
-        console.log(cubePositions);
+        cylinderPositions.push(x, y, z);
       }
     };
-  return cubePositions;
+  return cylinderPositions;
 }
 
 getPyramidPositions = () => {
