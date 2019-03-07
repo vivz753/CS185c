@@ -1,16 +1,12 @@
-<html>
-  <head>
-    <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
-    <script src="./bfunctions.js"></script>
-    <script src="https://unpkg.com/aframe-teleport-controls@0.2.x/dist/aframe-teleport-controls.min.js"></script>
-<script src="https://unpkg.com/aframe-controller-cursor-component@0.2.x/dist/aframe-controller-cursor-component.min.js"></script>
+
+<script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
 <script src="https://rawgit.com/ngokevin/kframe/csstricks/scenes/aincraft/components/random-color.js"></script>
 <script src="https://rawgit.com/ngokevin/kframe/csstricks/scenes/aincraft/components/snap.js"></script>
 <script src="https://rawgit.com/ngokevin/kframe/csstricks/scenes/aincraft/components/intersection-spawn.js"></script>
         <style>
             body {background-color: powderblue;}
         </style>
-  </head>
+
   <body>
     <a-scene>
         <a-assets>
@@ -25,12 +21,13 @@
 
         <a-cylinder id="ground" src="#groundTexture" radius="32" height="0.1"></a-cylinder>
 
-        <a-link class="link" href="index.html" title="restart" on="click" position="-3 7 -8"></a-link>
-        <a-link class="link" href="d.html" title="touch spinning block" on="click" position="2.5 6 -7"></a-link>
-        <a-link class="link" href="c.html" title="back to the city" on="click" position="-4 3 -7"></a-link>
+        <a-link class="link" href="start.html" title="restart" on="click" position="-3 7 -8"></a-link>
+        <a-link class="link" href="death.html" title="touch spinning block" on="click" position="2.5 6 -7"></a-link>
+        <a-link class="link" href="city.html" title="back to the city" on="click" position="-4 3 -7"></a-link>
 
 
-      <a-entity camera="active: true" look-controls wasd-controls position="0 4 2">
+
+      <a-entity camera="active: true" look-controls wasd-controls position="0 4 -1">
       <a-cursor id="cursor" intersection-spawn="event: click; mixin: voxel" raycaster="objects: .link"></a-cursor>
       
         </a-entity>
@@ -42,4 +39,3 @@
         <a-entity mixin="voxel" position="1 4 -6"></a-entity>
     </a-scene>
   </body>
-</html>

@@ -1,0 +1,18 @@
+
+    <script src="https://aframe.io/releases/0.9.0/aframe.min.js"></script>
+
+  <body>
+    <a-scene stats>
+    
+
+        <a-torus-knot position="0 5 -4" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000" color="#B84A39" arc="180" p="2" q="7" radius="5" radius-tubular="0.1"></a-torus-knot>
+
+      <a-sky color="#FF0000"></a-sky>
+
+      <a-link class="link" href="start.html" title="You died. Restart" on="click" position="0 5 -4"></a-link>
+      <a-entity camera="active: true" look-controls wasd-controls position="0 4 3">
+      <a-cursor raycaster="objects: .link"></a-cursor>
+    </a-entity>
+    </a-scene>
+  </body>
+

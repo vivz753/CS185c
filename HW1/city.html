@@ -1,0 +1,30 @@
+<html>
+  <head>
+    <script src="https://aframe.io/releases/0.9.0/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene>
+    <!-- create assets w/ image links -->
+        <a-assets>
+            <img id="sky" crossorigin="anonymous"
+                src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/city.jpg">
+            <video id="video" autoplay loop="true" src="vid.mp4"></video>
+        </a-assets>
+
+          <a-video src="#video" width="8" height="4" position="0 2 -4"></a-video>
+          <a-ring position="-2 7 -4" color="red" radius-inner="1" radius-outer="1.5"></a-ring>
+
+      <!-- <a-sky color="#ECECEC"></a-sky> -->
+      <a-sky id="image-360" radius="10" src="#sky"></a-sky>
+
+
+      <a-link class="link" href="blockmuseum.html" title="go to the block museum" on="click" position="2.5 6 -4"></a-link>
+      <a-link class="link" href="death.html" title="jump off building" on="click" position="-7 2 -4"></a-link>
+      <a-link class="link" href="start.html" title="restart" on="click" position="-2 7 -4"></a-link>
+
+      <a-entity camera="active: true" look-controls wasd-controls position="0 4 3">
+      <a-cursor raycaster="objects: .link"></a-cursor>
+    </a-entity>
+    </a-scene>
+  </body>
+</html>

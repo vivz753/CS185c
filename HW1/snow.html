@@ -1,6 +1,6 @@
 <html>
   <head>
-    <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
+    <script src="https://aframe.io/releases/0.9.0/aframe.min.js"></script>
   </head>
   <body>
     <a-scene>
@@ -18,10 +18,21 @@
       <a-sky id="image-360" radius="10" src="#sky"></a-sky>
 
 
-      <a-link class="link" href="d.html" title="break into car" on="click" position="2.5 3 -4"></a-link>
-      <a-link class="link" href="c.html" title="escape to civilization" on="click" position="-4 3 -4"></a-link>
 
-      <a-link class="link" href="index.html" title="restart" on="click" position="-2 5 -4"></a-link>
+      <a-entity rotation="-2 3 -7" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000">
+          <a-sphere radius=".2" position="-2 3 -7"></a-sphere>
+      </a-entity>
+      <a-entity rotation="-2 5 -7" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000">
+          <a-sphere radius=".2" position="-2 5 -7"></a-sphere>
+      </a-entity>
+      <a-entity rotation="-2 7 -7" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000">
+          <a-sphere radius=".2" position="-2 7 -7"></a-sphere>
+      </a-entity>
+
+      <a-link class="link" href="death.html" title="break into car" on="click" position="2.5 3 -4"></a-link>
+      <a-link class="link" href="city.html" title="escape to civilization" on="click" position="-4 3 -4"></a-link>
+      <a-link class="link" href="start.html" title="restart" on="click" position="-2 5 -4"></a-link>
+
       <a-entity camera="active: true" look-controls wasd-controls position="0 4 3">
       <a-cursor raycaster="objects: .link"></a-cursor>
     </a-entity>

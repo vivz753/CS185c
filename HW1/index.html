@@ -1,18 +1,51 @@
 <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
+<script src="./randomcolor.js"></script>
+
 
   <body>
     <a-scene>
-      <a-box position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
+      <!-- <a-box position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
       <a-sphere position="0 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
       <a-cylinder position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
-      <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4"></a-plane>
+      <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4"></a-plane> -->
+
       <a-sky color="#ECECEC"></a-sky>
 
+      <a-plane position=".3 2.5 -1" rotation="0 0 0" width="6" height="3" color="#7BC8C4"></a-plane>
+      <a-text 
+      position="-2 2.5 -1"
+      color="#FFFFFF"
+      value="The choices you make in this game will affect the storyline. Choose wisely.
+      
+      Use WASD keys to move around.
+      
+      Try walking past this text."></a-text>
+
+      <a-plane position=".3 2.5 -7" rotation="0 0 0" width="6" height="3" color="#FFAAC4"></a-plane>
+      <a-text 
+      position="-2 2.5 -7"
+      color="#000000"
+      value="Created by Vivian Leung
+      CS185c: Virtual Reality Programming
+      Prof. Chris Pollett
+      Spring 2019
+      
+      Homework 1"></a-text>
+
+      <a-torus random-color arc="360" radius="5" radius-tubular="0.1" position= "0 2 -3"></a-torus>
+      <a-torus random-color arc="360" radius="5" radius-tubular="0.1" position= "0 2 -5"></a-torus>
+      <a-torus random-color arc="360" radius="5" radius-tubular="0.1" position= "0 2 -8"></a-torus>
+      <a-torus random-color arc="360" radius="5" radius-tubular="0.1" position= "0 2 -12"></a-torus>
+      <a-torus random-color arc="360" radius="5" radius-tubular="0.1" position= "0 2 -17"></a-torus>
+      <a-torus random-color arc="360" radius="5" radius-tubular="0.1" position= "0 2 -23"></a-torus>
+      <a-torus random-color arc="360" radius="4" radius-tubular="0.08" position= "0 2 -30"></a-torus>
+      <a-torus random-color arc="360" radius="3.5" radius-tubular="0.05" position= "0 2 -38"></a-torus>
+      <a-torus random-color arc="360" radius="3" radius-tubular="0.02" position= "0 2 -46"></a-torus>
 
 
-      <a-link class="link" href="a.html" title="go to snow" on="click" position="-2 3 -4"></a-link>
-      <a-link class="link" href="b.html" title="go to fake world" on="click" position="2 3 -4"></a-link>
-      <a-entity camera="active: true" look-controls wasd-controls position="0 2 0">  
+      <a-link class="link" href="start.html" title="begin game" on="click" position="0 2 -25"></a-link>
+
+      <a-entity camera="active: true" look-controls wasd-controls position="0 2 2.5">  
         <a-cursor id="cursor"
             raycaster="objects: .link">
         </a-cursor>
