@@ -7,12 +7,13 @@
 
   <script src="https://rawgit.com/aframevr/aframe/master/dist/aframe-master.js"></script>
   <script src="../../dist/aframe-super-shooter-kit.min.js"></script>
+  <!-- physics system -->
   <script src="//cdn.rawgit.com/donmccurdy/aframe-physics-system/v3.3.0/dist/aframe-physics-system.min.js"></script>
   <script src="//cdn.rawgit.com/donmccurdy/aframe-extras/v4.1.2/dist/aframe-extras.min.js"></script>
   <script type="text/javascript" src="timer-component.js"></script>   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> -->
   
 
  
@@ -29,10 +30,11 @@
 
        let mainscore = 0;
       
+      // shoot function
         AFRAME.registerComponent('click-to-shoot', {
             init: function () {
 
-            
+            // trigger shoot when mouse or trigger is pressed; play shooting sound
               document.body.addEventListener('mousedown', () => { 
                 this.el.emit('shoot'); 
                  $("#shoot").components.sound.playSound();});
@@ -46,7 +48,7 @@
           });
 
 
-
+        // collision detecter; remove enemies and increase score if hit
         AFRAME.registerComponent('hit-handler', {
            // dependencies: ['material'],
             init: function () {
@@ -58,9 +60,8 @@
 
               $("#hitsound").components.sound.playSound();
 
-
-
-              if ((!document.getElementById("do1") && !document.getElementById("do2") && !document.getElementById("do3")) ||(document.getElementById("do1") && document.getElementById("do2") && document.getElementById("do3")))
+              if ((!document.getElementById("do1") && !document.getElementById("do2") && !document.getElementById("do3")) 
+              ||(document.getElementById("do1") && document.getElementById("do2") && document.getElementById("do3")))
               {
               mainscore= mainscore+ 1;
            
@@ -97,13 +98,13 @@
 
                    //change moon and planet position and rotation
                    $("#planet").setAttribute('position','0 -5 0')
-                    $("#bigmoon").setAttribute('rotation','0 28 -15')
+                   $("#bigmoon").setAttribute('rotation','0 28 -15')
 
                     //add video to the moon
                     $("#video").play();
                     $("#bigmoon").setAttribute('src','#video')
-                     $("#ua").setAttribute('gltf-model','airplane/PUSHILIN_Plane.gltf')
-                     $("#ua").setAttribute('scale','1.5 1.5 1.5') 
+                    $("#ua").setAttribute('gltf-model','airplane/PUSHILIN_Plane.gltf')
+                    $("#ua").setAttribute('scale','1.5 1.5 1.5') 
                      
                     $("#flying").setAttribute('gltf-model','flydog/model.gltf') 
                     $("#d").setAttribute('gltf-model','doggo/Dog with a collar tex1.gltf')
@@ -162,7 +163,7 @@
                   //tell user that they can interact with the Donuts
                   $("#score").setAttribute('position','-1.5 0.5 -4')
                   $("#score").setAttribute('text','height','4')
-                   $("#score").setAttribute('text','width','4')
+                  $("#score").setAttribute('text','width','4')
                   $("#score").setAttribute('text','value','You can also interact with the donuts.' )
                    
                 }
@@ -185,7 +186,6 @@
                 }
                
                }
-
 
              /********************Take care of the greeting scene when the user chose the bullet template****/
 
@@ -517,6 +517,7 @@
       animation='property:rotation; to: 0 360 0; loop:true; dur:20000'>
       </a-entity>
 
+      
       <a-entity 
       class="target" target
       rotation='10 0 0' 
